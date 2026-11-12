@@ -9,7 +9,11 @@ if ! python3 -m venv --help >/dev/null 2>&1; then
 fi
 
 if [[ ! -d .venv ]]; then
-  python3 -m venv .venv
+  if ! python3 -m venv .venv 2>/dev/null; then
+    sudo DEBIAN_FRONTEND=noninteractive apt-get update -qq
+    sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -qq python3.12-venv
+    python3 -m venv .venv
+  fi
 fi
 
 .venv/bin/python -m pip install --upgrade pip
