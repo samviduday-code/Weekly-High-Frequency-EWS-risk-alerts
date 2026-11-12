@@ -1,0 +1,31 @@
+{
+  "monthly_as_of": "2026-10-15",
+  "generated_at": "2026-11-01",
+  "flags": [
+    {
+      "id_prefix": "credit_growth",
+      "priority": "High_Priority",
+      "monthly_level": "P1",
+      "weekly_level": "P2",
+      "summary": "Credit growth stress signal"
+    },
+    {
+      "id_prefix": "credit_growth",
+      "priority": "High_Priority",
+      "weekly_level": "P2",
+      "summary": "duplicate prefix weekly only"
+    },
+    {
+      "id_prefix": "liquidity",
+      "priority": "High_Priority",
+      "weekly_level": "P1",
+      "summary": "Liquidity tightening"
+    },
+    {
+      "id_prefix": "noise",
+      "priority": "Low_Priority",
+      "monthly_level": "P1",
+      "summary": "Should be filtered out"
+    }
+  ]
+}

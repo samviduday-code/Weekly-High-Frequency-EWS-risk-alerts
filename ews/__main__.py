@@ -1,4 +1,4 @@
-"""CLI entrypoint for local smoke checks."""
+"""CLI entrypoint for HF EWS tooling."""
 
 from __future__ import annotations
 
@@ -7,6 +7,7 @@ import platform
 import sys
 
 from ews import __version__
+from ews.weekly import run_weekly
 
 
 def cmd_status() -> int:
@@ -16,13 +17,39 @@ def cmd_status() -> int:
     return 0
 
 
+def _run_weekly_and_report(*, post_slack: bool, skip_fetch: bool) -> int:
+    result = run_weekly(post_slack=post_slack, skip_fetch=skip_fetch)
+    if result.reason != "ok" or result.exit_code != 0:
+        if result.message:
+            print(result.message, file=sys.stderr)
+    return result.exit_code
+
+
 def main(argv: list[str] | None = None) -> int:
+    argv = list(sys.argv[1:] if argv is None else argv)
     parser = argparse.ArgumentParser(prog="ews")
     sub = parser.add_subparsers(dest="command", required=True)
     sub.add_parser("status", help="Print environment status")
+    weekly = sub.add_parser("weekly", help="Run Monday HF EWS digest pipeline")
+    weekly.add_argument(
+        "--post-slack",
+        action="store_true",
+        help="Post digest to #weekly-high-frequency-ews",
+    )
+    weekly.add_argument(
+        "--skip-fetch",
+        action="store_true",
+        help="Skip fetch_new_hf_and_sep_actuals.py (build only)",
+    )
+
     args = parser.parse_args(argv)
     if args.command == "status":
         return cmd_status()
+    if args.command == "weekly":
+        return _run_weekly_and_report(
+            post_slack=args.post_slack,
+            skip_fetch=args.skip_fetch,
+        )
     return 1
 
 
