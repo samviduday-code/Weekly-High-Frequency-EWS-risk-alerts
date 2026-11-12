@@ -89,6 +89,7 @@ def run_weekly(
             age=age,
             week_stamp=week_stamp,
             mention_samvid=True,
+            latest=latest,
         )
         return WeeklyResult(
             exit_code=0,
@@ -103,6 +104,7 @@ def run_weekly(
         age=age,
         week_stamp=week_stamp,
         mention_samvid=mention,
+        latest=latest,
     )
 
     if not post_email:
