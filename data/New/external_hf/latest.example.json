@@ -1,0 +1,13 @@
+{
+  "monthly_as_of": "YYYY-MM-DD",
+  "generated_at": "YYYY-MM-DD",
+  "flags": [
+    {
+      "id_prefix": "indicator_name",
+      "priority": "High_Priority",
+      "monthly_level": "P1",
+      "weekly_level": "P2",
+      "summary": "Replace with the one-line signal from the EWS build"
+    }
+  ]
+}

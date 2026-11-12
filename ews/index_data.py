@@ -9,7 +9,7 @@ import sys
 from dataclasses import dataclass
 from pathlib import Path
 
-from ews.config import BUILD_SCRIPT, DEFAULT_INDEX_DATA_REPO, FETCH_SCRIPT
+from ews.config import BUILD_SCRIPT, FETCH_SCRIPT
 from ews.config import default_index_data_dir
 from ews.paths import latest_json_path, repo_root
 
@@ -25,26 +25,40 @@ def resolve_index_data_dir() -> Path:
     return Path(default_index_data_dir(str(repo_root())))
 
 
+def _missing_latest_message(index_data_dir: Path) -> str:
+    return (
+        f"latest.json missing at {latest_json_path(index_data_dir)}. "
+        "Commit the vintage in this repo at data/New/external_hf/latest.json "
+        "(see data/New/external_hf/latest.example.json)."
+    )
+
+
 def ensure_index_data_present(index_data_dir: Path) -> BuildOutcome:
-    if index_data_dir.is_dir() and any(index_data_dir.iterdir()):
+    if latest_json_path(index_data_dir).is_file() or (
+        index_data_dir.is_dir() and any(index_data_dir.iterdir())
+    ):
         return BuildOutcome(True, "index-data directory present", index_data_dir)
     return BuildOutcome(
         False,
-        f"index-data missing at {index_data_dir}; run scripts/bootstrap_index_data.sh "
-        f"(clone {DEFAULT_INDEX_DATA_REPO})",
+        _missing_latest_message(index_data_dir),
         index_data_dir,
     )
 
 
-def _run_script(index_data_dir: Path, script_name: str) -> tuple[int, str]:
+def _script_path(index_data_dir: Path, script_name: str) -> Path | None:
     script = index_data_dir / script_name
-    if not script.is_file():
-        # Allow scripts under a scripts/ subfolder
-        alt = index_data_dir / "scripts" / script_name
-        if alt.is_file():
-            script = alt
-        else:
-            return 127, f"script not found: {script_name}"
+    if script.is_file():
+        return script
+    alt = index_data_dir / "scripts" / script_name
+    if alt.is_file():
+        return alt
+    return None
+
+
+def _run_script(index_data_dir: Path, script_name: str) -> tuple[int, str]:
+    script = _script_path(index_data_dir, script_name)
+    if script is None:
+        return 127, f"script not found: {script_name}"
     proc = subprocess.run(
         [sys.executable, str(script)],
         cwd=index_data_dir,
@@ -61,6 +75,13 @@ def run_fetch_and_build(*, skip_fetch: bool = False) -> BuildOutcome:
     present = ensure_index_data_present(index_data_dir)
     if not present.ok:
         return present
+
+    fetch_script = _script_path(index_data_dir, FETCH_SCRIPT)
+    build_script = _script_path(index_data_dir, BUILD_SCRIPT)
+    if fetch_script is None and build_script is None:
+        if latest_json_path(index_data_dir).is_file():
+            return BuildOutcome(True, "using committed latest.json", index_data_dir)
+        return BuildOutcome(False, _missing_latest_message(index_data_dir), index_data_dir)
 
     if not skip_fetch:
         code, msg = _run_script(index_data_dir, FETCH_SCRIPT)

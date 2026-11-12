@@ -42,6 +42,37 @@ def test_weekly_stdout_happy_path(index_data_tmp: Path, monkeypatch: pytest.Monk
     assert "liquidity" in result.digest
 
 
+def test_weekly_reads_committed_latest_json(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    root = tmp_path / "vintage"
+    dest = root / "New" / "external_hf"
+    dest.mkdir(parents=True)
+    (dest / "latest.json").write_text(
+        json.dumps(
+            {
+                "monthly_as_of": "2026-10-15",
+                "flags": [
+                    {
+                        "id_prefix": "credit_growth",
+                        "priority": "High_Priority",
+                        "monthly_level": "P1",
+                        "summary": "Credit growth stress signal",
+                    }
+                ],
+            }
+        ),
+        encoding="utf-8",
+    )
+    monkeypatch.setenv("INDEX_DATA_DIR", str(root))
+    monkeypatch.setattr("ews.weekly.monday_week_stamp", lambda: "2026-W46")
+    result = run_weekly(post_email=False, skip_fetch=False)
+    assert result.exit_code == 0
+    assert result.reason == "ok"
+    assert result.digest is not None
+    assert "credit_growth" in result.digest
+
+
 def test_weekly_missing_index_data(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
     missing = tmp_path / "missing"
     monkeypatch.setenv("INDEX_DATA_DIR", str(missing))

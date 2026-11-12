@@ -6,14 +6,25 @@ Indian HF early-warning (EWS) risk alerts pipeline.
 
 | Location | Purpose |
 | --- | --- |
-| `INDEX_DATA_DIR` (default: `.data/index-data`) | Clone of `samviduday-code/index-data` with fetch/build scripts |
-| `New/external_hf/latest.json` | Built EWS vintages consumed by the digest |
+| `data/New/external_hf/latest.json` | This week's vintage. Commit this file in the repo. |
+| `data/New/external_hf/latest.example.json` | Shape to copy. The weekly command does not read it. |
 | `.ews/email_last_post.json` | Repeat guard (not committed) |
 
-Bootstrap index-data:
+Add this week's vintage on GitHub:
+
+1. Open the repo, then **Add file → Create new file**.
+2. Name the file `data/New/external_hf/latest.json` (type the slashes; GitHub creates the folders).
+3. Paste the JSON. Start from `latest.example.json`. Set `monthly_as_of` to the real monthly date (`YYYY-MM-DD`, within 75 days). Each flag that should be emailed needs `"priority": "High_Priority"` and a `monthly_level` or `weekly_level` such as `"P1"`. `summary` is the line in the email. `id_prefix` is the indicator name.
+4. Commit the file to `main`.
+
+From a clone:
 
 ```bash
-bash scripts/bootstrap_index_data.sh
+mkdir -p data/New/external_hf
+# save the vintage as data/New/external_hf/latest.json
+git add data/New/external_hf/latest.json
+git commit -m "Add this week's EWS vintage"
+git push
 ```
 
 ## Weekly Monday digest

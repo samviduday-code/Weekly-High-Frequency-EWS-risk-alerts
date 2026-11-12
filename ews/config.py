@@ -28,4 +28,4 @@ def default_index_data_dir(repo_root: str) -> str:
     env = os.environ.get("INDEX_DATA_DIR")
     if env:
         return os.path.abspath(env)
-    return os.path.join(repo_root, ".data", "index-data")
+    return os.path.join(repo_root, "data")
