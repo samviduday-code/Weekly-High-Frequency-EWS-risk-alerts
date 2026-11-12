@@ -17,8 +17,8 @@ def cmd_status() -> int:
     return 0
 
 
-def _run_weekly_and_report(*, post_slack: bool, skip_fetch: bool) -> int:
-    result = run_weekly(post_slack=post_slack, skip_fetch=skip_fetch)
+def _run_weekly_and_report(*, post_email: bool, skip_fetch: bool) -> int:
+    result = run_weekly(post_email=post_email, skip_fetch=skip_fetch)
     if result.reason != "ok" or result.exit_code != 0:
         if result.message:
             print(result.message, file=sys.stderr)
@@ -32,9 +32,9 @@ def main(argv: list[str] | None = None) -> int:
     sub.add_parser("status", help="Print environment status")
     weekly = sub.add_parser("weekly", help="Run Monday HF EWS digest pipeline")
     weekly.add_argument(
-        "--post-slack",
+        "--post-email",
         action="store_true",
-        help="Post digest to #weekly-high-frequency-ews",
+        help="Email the digest to samvid.uday@navi.com (override with EWS_EMAIL_TO)",
     )
     weekly.add_argument(
         "--skip-fetch",
@@ -47,7 +47,7 @@ def main(argv: list[str] | None = None) -> int:
         return cmd_status()
     if args.command == "weekly":
         return _run_weekly_and_report(
-            post_slack=args.post_slack,
+            post_email=args.post_email,
             skip_fetch=args.skip_fetch,
         )
     return 1

@@ -1,12 +1,16 @@
-"""Slack digest formatting."""
+"""Plain-text weekly digest formatting."""
 
 from __future__ import annotations
 
 from datetime import datetime
-from ews.config import SAMVID_SLACK_MENTION, SLACK_CHANNEL_NAME
+from ews.config import digest_recipient
 from ews.flags import DigestFlag
 from ews.gates import AgeCheck, monday_week_stamp
 from ews.tz_util import IST
+
+
+def weekly_subject(week_stamp: str) -> str:
+    return f"HF EWS — weekly digest (week {week_stamp})"
 
 
 def format_weekly_digest(
@@ -20,24 +24,23 @@ def format_weekly_digest(
     dt = datetime.now(IST)
     now = f"{dt.strftime('%d %b %Y')}, {dt.strftime('%H:%M')} IST"
     lines = [
-        f"**HF EWS — weekly digest** (week {week_stamp} · {now})",
-        f"Channel: {SLACK_CHANNEL_NAME}",
+        f"HF EWS — weekly digest (week {week_stamp} · {now})",
         "",
     ]
     if mention_samvid or age.mention_samvid:
-        lines.append(f"{SAMVID_SLACK_MENTION} — dataset age review")
+        lines.append(f"Dataset age review for {digest_recipient()}")
         lines.append("")
     if age.monthly_as_of is not None and age.age_days is not None:
         lines.append(
-            f"Monthly dataset as of **{age.monthly_as_of.isoformat()}** "
+            f"Monthly dataset as of {age.monthly_as_of.isoformat()} "
             f"({age.age_days} days old)."
         )
         lines.append("")
     if not flags:
-        lines.append("_No High_Priority flags this week._")
+        lines.append("No High_Priority flags this week.")
     else:
-        lines.append("**High-priority flags**")
+        lines.append("High-priority flags")
         for flag in flags:
             detail = flag.raw.get("summary") or flag.raw.get("message") or flag.label
-            lines.append(f"• **{flag.id_prefix}** — {detail}")
+            lines.append(f"- {flag.id_prefix} — {detail}")
     return "\n".join(lines)

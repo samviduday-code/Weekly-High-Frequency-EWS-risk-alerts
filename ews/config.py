@@ -4,10 +4,8 @@ from __future__ import annotations
 
 import os
 
-# Slack delivery (monday-ews)
-SLACK_CHANNEL_ID = "C0CH2MP70RF"
-SLACK_CHANNEL_NAME = "#weekly-high-frequency-ews"
-SAMVID_SLACK_MENTION = "<@U0C2JAUECJV>"
+# Email delivery. Recipient defaults to the automation owner.
+DEFAULT_DIGEST_EMAIL = "samvid.uday@navi.com"
 
 # Data sources
 DEFAULT_INDEX_DATA_REPO = "https://github.com/samviduday-code/index-data.git"
@@ -19,7 +17,11 @@ STALE_MENTION_DAYS = 60
 FETCH_SCRIPT = "fetch_new_hf_and_sep_actuals.py"
 BUILD_SCRIPT = "build_ews_vintages.py"
 
-REPEAT_GUARD_FILE = "slack_last_post.json"
+REPEAT_GUARD_FILE = "email_last_post.json"
+
+
+def digest_recipient() -> str:
+    return os.environ.get("EWS_EMAIL_TO", DEFAULT_DIGEST_EMAIL).strip()
 
 
 def default_index_data_dir(repo_root: str) -> str:

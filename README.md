@@ -8,7 +8,7 @@ Indian HF early-warning (EWS) risk alerts pipeline.
 | --- | --- |
 | `INDEX_DATA_DIR` (default: `.data/index-data`) | Clone of `samviduday-code/index-data` with fetch/build scripts |
 | `New/external_hf/latest.json` | Built EWS vintages consumed by the digest |
-| `.ews/slack_last_post.json` | Repeat guard (not committed) |
+| `.ews/email_last_post.json` | Repeat guard (not committed) |
 
 Bootstrap index-data:
 
@@ -20,12 +20,12 @@ bash scripts/bootstrap_index_data.sh
 
 ```bash
 .venv/bin/python -m ews weekly              # stdout only
-.venv/bin/python -m ews weekly --post-slack  # requires SLACK_BOT_TOKEN
+.venv/bin/python -m ews weekly --post-email  # requires SMTP_HOST, SMTP_USERNAME, SMTP_PASSWORD
 ```
 
 Gates: refuse when monthly data is older than 75 days; skip duplicate digests in the same ISO week; High_Priority flags only.
 
-Delivery channel: `#weekly-high-frequency-ews` (`C0CH2MP70RF`).
+Delivery: email to `samvid.uday@navi.com` (`EWS_EMAIL_TO` overrides the recipient). `SMTP_PORT` defaults to 587 with STARTTLS. Set `EWS_EMAIL_FROM` when the From address differs from `SMTP_USERNAME`.
 
 ## Development (Cloud Agent)
 
