@@ -1,3 +1,3 @@
-"""Indian high-frequency EWS risk alerts pipeline (stub)."""
+"""Indian high-frequency EWS risk alerts pipeline."""
 
-__version__ = "0.0.0"
+__version__ = "0.1.0"
