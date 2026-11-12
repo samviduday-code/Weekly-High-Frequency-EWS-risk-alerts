@@ -19,4 +19,6 @@ def latest_json_path(index_data_dir: str | os.PathLike[str]) -> Path:
 
 
 def repeat_guard_path() -> Path:
-    return repo_root() / ".ews" / "slack_last_post.json"
+    from ews.config import REPEAT_GUARD_FILE
+
+    return repo_root() / ".ews" / REPEAT_GUARD_FILE

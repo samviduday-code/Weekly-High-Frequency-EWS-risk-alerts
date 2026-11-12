@@ -6,8 +6,7 @@ import sys
 from dataclasses import dataclass
 from typing import Literal
 
-from ews.config import SLACK_CHANNEL_ID
-from ews.digest import format_weekly_digest
+from ews.digest import format_weekly_digest, weekly_subject
 from ews.flags import filter_high_priority_flags
 from ews.gates import (
     AgeCheck,
@@ -23,8 +22,8 @@ from ews.index_data import (
     load_latest_json,
     run_fetch_and_build,
 )
+from ews.email_delivery import EmailDeliveryError, send_digest
 from ews.repeat_guard import load_last_post, save_last_post
-from ews.slack_delivery import SlackDeliveryError, post_message
 
 Reason = Literal[
     "ok",
@@ -32,7 +31,7 @@ Reason = Literal[
     "stale_data",
     "duplicate_digest",
     "missing_latest",
-    "slack_failed",
+    "email_failed",
 ]
 
 
@@ -47,8 +46,9 @@ class WeeklyResult:
 
 def run_weekly(
     *,
-    post_slack: bool = False,
+    post_email: bool = False,
     skip_fetch: bool = False,
+    force: bool = False,
 ) -> WeeklyResult:
     build: BuildOutcome = run_fetch_and_build(skip_fetch=skip_fetch)
     if not build.ok:
@@ -82,7 +82,7 @@ def run_weekly(
     repeat: RepeatCheck = check_repeat(
         week_stamp=week_stamp,
         fingerprint=fingerprint,
-        last_post=load_last_post(),
+        last_post=None if force else load_last_post(),
     )
     if repeat.duplicate:
         digest = format_weekly_digest(
@@ -90,12 +90,13 @@ def run_weekly(
             age=age,
             week_stamp=week_stamp,
             mention_samvid=True,
+            latest=latest,
         )
         return WeeklyResult(
             exit_code=0,
             reason="duplicate_digest",
             message="skipped: duplicate digest for this calendar week",
-            digest=digest if post_slack else None,
+            digest=digest if post_email else None,
         )
 
     mention = age.mention_samvid
@@ -104,18 +105,19 @@ def run_weekly(
         age=age,
         week_stamp=week_stamp,
         mention_samvid=mention,
+        latest=latest,
     )
 
-    if not post_slack:
+    if not post_email:
         print(digest, file=sys.stdout)
         return WeeklyResult(exit_code=0, reason="ok", message="digest written to stdout", digest=digest)
 
     try:
-        post_message(text=digest)
-    except SlackDeliveryError as exc:
+        recipient = send_digest(subject=weekly_subject(week_stamp), body=digest)
+    except EmailDeliveryError as exc:
         return WeeklyResult(
             exit_code=1,
-            reason="slack_failed",
+            reason="email_failed",
             message=str(exc),
             digest=digest,
         )
@@ -123,12 +125,12 @@ def run_weekly(
     save_last_post(
         week_iso=week_stamp,
         digest_hash=fingerprint,
-        channel_id=SLACK_CHANNEL_ID,
+        recipient=recipient,
     )
     return WeeklyResult(
         exit_code=0,
         reason="ok",
-        message="posted to Slack",
+        message=f"emailed {recipient}",
         digest=digest,
         posted=True,
     )
