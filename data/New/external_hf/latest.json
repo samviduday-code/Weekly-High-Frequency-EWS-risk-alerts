@@ -6,6 +6,7 @@
   "red_flags": 4,
   "monthly_red_amber": 11,
   "vintage_note": "Vintage cutoff 30 Oct 2026. Uses only prints available on or before that date. No forward fill of later releases.",
+  "canvas_url": "https://cursor.com/dashboard/shared-canvases?shareId=canvas-27YtD-0zdvBX48iR4mXs2f1r",
   "lending_implications": [
     "Household demand / confidence soft. Sentiment is below its own history, which pressures discretionary personal loans and BNPL. Keep salary verification strict. Vars: Consumer sentiment (ICS).",
     "Activity mix uneven. Goods-movement and construction-adjacent series are soft. Prefer salaried and GST-registered self-employed borrowers. Vars: Core cement, E-way bills, IIP Mining, Core steel.",

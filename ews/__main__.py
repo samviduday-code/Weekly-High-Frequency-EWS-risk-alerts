@@ -17,8 +17,8 @@ def cmd_status() -> int:
     return 0
 
 
-def _run_weekly_and_report(*, post_email: bool, skip_fetch: bool) -> int:
-    result = run_weekly(post_email=post_email, skip_fetch=skip_fetch)
+def _run_weekly_and_report(*, post_email: bool, skip_fetch: bool, force: bool) -> int:
+    result = run_weekly(post_email=post_email, skip_fetch=skip_fetch, force=force)
     if result.reason != "ok" or result.exit_code != 0:
         if result.message:
             print(result.message, file=sys.stderr)
@@ -41,6 +41,11 @@ def main(argv: list[str] | None = None) -> int:
         action="store_true",
         help="Skip fetch_new_hf_and_sep_actuals.py (build only)",
     )
+    weekly.add_argument(
+        "--force",
+        action="store_true",
+        help="Send even if this week's digest was already emailed",
+    )
 
     args = parser.parse_args(argv)
     if args.command == "status":
@@ -49,6 +54,7 @@ def main(argv: list[str] | None = None) -> int:
         return _run_weekly_and_report(
             post_email=args.post_email,
             skip_fetch=args.skip_fetch,
+            force=args.force,
         )
     return 1
 

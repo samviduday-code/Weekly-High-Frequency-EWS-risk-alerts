@@ -34,6 +34,9 @@ def _headline(latest: dict[str, Any] | None) -> list[str]:
     amber = latest.get("monthly_red_amber")
     if reds is not None and amber is not None:
         lines.append(f"RED flags (monthly and weekly): {reds}. Monthly RED+AMBER: {amber}.")
+    canvas_url = latest.get("canvas_url")
+    if isinstance(canvas_url, str) and canvas_url.strip():
+        lines.append(f"Canvas: {canvas_url.strip()}")
     if lines:
         lines.append("")
     return lines

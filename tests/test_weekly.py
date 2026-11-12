@@ -8,6 +8,7 @@ from pathlib import Path
 import pytest
 
 from ews import gates
+from ews.config import digest_recipient
 from ews.weekly import run_weekly
 
 FIXTURE_ROOT = Path(__file__).parent / "fixtures" / "index_data"
@@ -73,6 +74,36 @@ def test_weekly_reads_committed_latest_json(
     assert "credit_growth" in result.digest
 
 
+def test_digest_includes_canvas_link(index_data_tmp: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr("ews.weekly.monday_week_stamp", lambda: "2026-W46")
+    latest_path = index_data_tmp / "New" / "external_hf" / "latest.json"
+    data = json.loads(latest_path.read_text(encoding="utf-8"))
+    data["canvas_url"] = "https://cursor.com/canvas/store/canvas-1"
+    latest_path.write_text(json.dumps(data), encoding="utf-8")
+    result = run_weekly(post_email=False, skip_fetch=True)
+    assert result.digest is not None
+    assert "Canvas: https://cursor.com/canvas/store/canvas-1" in result.digest
+
+
+def test_force_resends_duplicate_week(
+    index_data_tmp: Path,
+    isolated_repeat_guard: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr("ews.weekly.monday_week_stamp", lambda: "2026-W46")
+    sent: list[str] = []
+
+    def fake_send(*, subject: str, body: str, to_addr: str | None = None) -> str:
+        sent.append(subject)
+        return digest_recipient()
+
+    monkeypatch.setattr("ews.weekly.send_digest", fake_send)
+    assert run_weekly(post_email=True, skip_fetch=True).reason == "ok"
+    assert run_weekly(post_email=True, skip_fetch=True).reason == "duplicate_digest"
+    assert run_weekly(post_email=True, skip_fetch=True, force=True).reason == "ok"
+    assert len(sent) == 2
+
+
 def test_weekly_missing_index_data(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
     missing = tmp_path / "missing"
     monkeypatch.setenv("INDEX_DATA_DIR", str(missing))
@@ -119,7 +150,7 @@ def test_duplicate_skips_post(
             {
                 "week_iso": "2026-W46",
                 "digest_hash": digest_fingerprint(flags),
-                "recipient": "samvid.uday@navi.com",
+                "recipient": digest_recipient(),
             }
         ),
         encoding="utf-8",
@@ -140,7 +171,7 @@ def test_weekly_emails_digest(
     def fake_send(*, subject: str, body: str, to_addr: str | None = None) -> str:
         sent["subject"] = subject
         sent["body"] = body
-        sent["to"] = to_addr or "samvid.uday@navi.com"
+        sent["to"] = to_addr or digest_recipient()
         return sent["to"]
 
     monkeypatch.setattr("ews.weekly.send_digest", fake_send)
@@ -148,8 +179,8 @@ def test_weekly_emails_digest(
     assert result.exit_code == 0
     assert result.posted is True
     assert result.reason == "ok"
-    assert sent["to"] == "samvid.uday@navi.com"
+    assert sent["to"] == digest_recipient()
     assert "week 2026-W46" in sent["subject"]
     assert "credit_growth" in sent["body"]
     guard = json.loads(isolated_repeat_guard.read_text(encoding="utf-8"))
-    assert guard["recipient"] == "samvid.uday@navi.com"
+    assert guard["recipient"] == digest_recipient()

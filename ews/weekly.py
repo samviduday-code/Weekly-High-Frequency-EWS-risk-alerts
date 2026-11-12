@@ -48,6 +48,7 @@ def run_weekly(
     *,
     post_email: bool = False,
     skip_fetch: bool = False,
+    force: bool = False,
 ) -> WeeklyResult:
     build: BuildOutcome = run_fetch_and_build(skip_fetch=skip_fetch)
     if not build.ok:
@@ -81,7 +82,7 @@ def run_weekly(
     repeat: RepeatCheck = check_repeat(
         week_stamp=week_stamp,
         fingerprint=fingerprint,
-        last_post=load_last_post(),
+        last_post=None if force else load_last_post(),
     )
     if repeat.duplicate:
         digest = format_weekly_digest(
