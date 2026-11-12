@@ -43,6 +43,10 @@ else
   echo "index-data: cloning $REPO_URL -> $INDEX_DATA_DIR"
   if ! git clone --depth 1 "$REPO_URL" "$INDEX_DATA_DIR"; then
     echo "index-data: clone failed (check repo is on the Cloud Agent environment and GitHub grants access)" >&2
+    if [[ "${BOOTSTRAP_OPTIONAL:-}" == "1" ]]; then
+      echo "index-data: continuing (BOOTSTRAP_OPTIONAL=1)" >&2
+      exit 0
+    fi
     exit 1
   fi
 fi
