@@ -17,6 +17,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent
 PANEL_PATH = ROOT / "New" / "external_hf" / "panel.json"
 LATEST_PATH = ROOT / "New" / "external_hf" / "latest.json"
+PREVIOUS_PATH = ROOT / "New" / "external_hf" / "previous_pull.json"
 IST = timezone(timedelta(hours=5, minutes=30))
 
 
@@ -123,7 +124,94 @@ def build_flag(series: dict, scored: dict, newer: dict | None) -> dict | None:
     return flag
 
 
-def build_vintage(panel: dict, cutoff: date, canvas_url: str | None) -> dict:
+def flag_level(flag: dict) -> str | None:
+    level = flag.get("monthly_level") or flag.get("weekly_level")
+    if isinstance(level, str):
+        return level
+    return None
+
+
+def same_number(left: object, right: object) -> bool:
+    if isinstance(left, (int, float)) and isinstance(right, (int, float)):
+        return round(float(left), 4) == round(float(right), 4)
+    return left == right
+
+
+def movement_lines(previous: dict | None, flags: list[dict], cutoff: date) -> list[str]:
+    """At most two lines on what changed since the last scored pull."""
+    if not previous:
+        return ["No earlier pull is stored. This run is the baseline."]
+    raw_date = previous.get("data_pull_as_of") or previous.get("monthly_as_of")
+    try:
+        previous_label = date.fromisoformat(str(raw_date)).strftime("%d %b %Y").lstrip("0")
+    except ValueError:
+        previous_label = str(raw_date)
+    previous_flags = {
+        flag["id_prefix"]: flag
+        for flag in previous.get("flags", [])
+        if isinstance(flag, dict) and flag.get("id_prefix")
+    }
+    current_flags = {flag["id_prefix"]: flag for flag in flags}
+    moved: list[str] = []
+    for key in sorted(set(previous_flags) | set(current_flags)):
+        before = previous_flags.get(key)
+        after = current_flags.get(key)
+        if before is None and after is not None:
+            moved.append(f"{after['name']} is new ({flag_level(after)}, {after['latest']} as of {after['as_of']}).")
+            continue
+        if after is None and before is not None:
+            moved.append(f"{before.get('name', key)} dropped out of the flagged set.")
+            continue
+        if before is None or after is None:
+            continue
+        changed = not (
+            same_number(before.get("latest"), after.get("latest"))
+            and same_number(before.get("z"), after.get("z"))
+            and before.get("as_of") == after.get("as_of")
+            and flag_level(before) == flag_level(after)
+        )
+        if changed:
+            moved.append(
+                f"{after['name']} {before.get('latest')} -> {after.get('latest')} "
+                f"(z {before.get('z')} -> {after.get('z')}, "
+                f"{flag_level(before)} -> {flag_level(after)}, as of {after.get('as_of')})."
+            )
+    if not moved:
+        return [
+            f"No scored print has moved since the {previous_label} pull.",
+            (
+                f"Cutoff is {cutoff.strftime('%d %b %Y').lstrip('0')}. "
+                "The heatmap matches that pull because the panel has no later scored observation."
+            ),
+        ]
+    shown = moved[:1]
+    rest = len(moved) - len(shown)
+    if rest:
+        shown.append(f"{rest} more flagged series also moved since the {previous_label} pull.")
+    else:
+        shown.append(f"Compared with the {previous_label} pull. The other flagged series are unchanged.")
+    return shown
+
+
+def snapshot_flags(flags: list[dict], data_pull_as_of: str) -> dict:
+    return {
+        "data_pull_as_of": data_pull_as_of,
+        "flags": [
+            {
+                "id_prefix": flag["id_prefix"],
+                "name": flag["name"],
+                "latest": flag["latest"],
+                "z": flag["z"],
+                "as_of": flag["as_of"],
+                "monthly_level": flag.get("monthly_level"),
+                "weekly_level": flag.get("weekly_level"),
+            }
+            for flag in flags
+        ],
+    }
+
+
+def build_vintage(panel: dict, cutoff: date, canvas_url: str | None, previous: dict | None) -> dict:
     flags = []
     for series in panel.get("series", []):
         scored_rows = scored_observations(series, cutoff)
@@ -156,6 +244,7 @@ def build_vintage(panel: dict, cutoff: date, canvas_url: str | None) -> dict:
             "No forward fill of later releases."
         ),
         "lending_implications": panel.get("lending_implications") or [],
+        "since_last_pull": movement_lines(previous, flags, cutoff),
         "flags": flags,
     }
     if canvas_url:
@@ -176,18 +265,54 @@ def existing_canvas_url() -> str | None:
     return None
 
 
+def load_previous() -> dict | None:
+    if not PREVIOUS_PATH.is_file():
+        return None
+    try:
+        payload = json.loads(PREVIOUS_PATH.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return None
+    if isinstance(payload, dict):
+        return payload
+    return None
+
+
+def scored_fingerprint(flags: list[dict]) -> list[tuple]:
+    return [
+        (
+            flag["id_prefix"],
+            flag.get("latest"),
+            flag.get("z"),
+            flag.get("as_of"),
+            flag.get("monthly_level"),
+            flag.get("weekly_level"),
+        )
+        for flag in flags
+    ]
+
+
 def main() -> int:
     panel = json.loads(PANEL_PATH.read_text(encoding="utf-8"))
     cutoff = cutoff_date()
     canvas_url = existing_canvas_url() or panel.get("canvas_url")
     if not isinstance(canvas_url, str):
         canvas_url = None
-    vintage = build_vintage(panel, cutoff, canvas_url)
+    previous = load_previous()
+    vintage = build_vintage(panel, cutoff, canvas_url, previous)
     LATEST_PATH.parent.mkdir(parents=True, exist_ok=True)
     LATEST_PATH.write_text(
         json.dumps(vintage, indent=2) + "\n",
         encoding="utf-8",
     )
+    if previous is None or scored_fingerprint(previous.get("flags", [])) != scored_fingerprint(vintage["flags"]):
+        pull_as_of = cutoff.isoformat()
+        dated = [str(flag["as_of"]) for flag in vintage["flags"]]
+        if dated:
+            pull_as_of = max(dated)
+        PREVIOUS_PATH.write_text(
+            json.dumps(snapshot_flags(vintage["flags"], pull_as_of), indent=2) + "\n",
+            encoding="utf-8",
+        )
     print(
         f"wrote {LATEST_PATH} cutoff={cutoff.isoformat()} "
         f"flags={len(vintage['flags'])}"

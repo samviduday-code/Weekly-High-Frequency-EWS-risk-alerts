@@ -37,6 +37,11 @@ def _headline(latest: dict[str, Any] | None) -> list[str]:
     canvas_url = latest.get("canvas_url")
     if isinstance(canvas_url, str) and canvas_url.strip():
         lines.append(f"Canvas: {canvas_url.strip()}")
+    moved = latest.get("since_last_pull")
+    if isinstance(moved, list):
+        for note in moved:
+            if isinstance(note, str) and note.strip():
+                lines.append(note.strip())
     if lines:
         lines.append("")
     return lines

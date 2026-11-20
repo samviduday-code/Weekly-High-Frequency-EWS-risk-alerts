@@ -13,6 +13,10 @@
     "Cash-stress proxies. Rising ATM and AePS use is inverted, so an increase marks rural and semi-urban liquidity stress. Vars: ATM (NFS) volume, AePS cash withdrawals.",
     "System credit backdrop. Bank credit is still firm versus history. Defend cutoffs against adverse selection if competitors ease. Vars: Bank credit, Non-food bank credit."
   ],
+  "since_last_pull": [
+    "No scored print has moved since the 30 Oct 2026 pull.",
+    "Cutoff is 20 Nov 2026. The heatmap matches that pull because the panel has no later scored observation."
+  ],
   "flags": [
     {
       "id_prefix": "consumer_sentiment_ics",

@@ -33,6 +33,25 @@ def test_build_uses_latest_scored_print_on_or_before_cutoff(tmp_path: Path) -> N
     external = tmp_path / "New" / "external_hf"
     external.mkdir(parents=True)
     (external / "panel.json").write_text(json.dumps(panel), encoding="utf-8")
+    (external / "previous_pull.json").write_text(
+        json.dumps(
+            {
+                "data_pull_as_of": "2026-10-30",
+                "flags": [
+                    {
+                        "id_prefix": "eway_bills",
+                        "name": "E-way bills",
+                        "latest": 6.0,
+                        "z": -1.2,
+                        "as_of": "2026-08-31",
+                        "monthly_level": "AMBER",
+                        "weekly_level": None,
+                    }
+                ],
+            }
+        ),
+        encoding="utf-8",
+    )
     script = tmp_path / "build_ews_vintages.py"
     script.write_text(SCRIPT.read_text(encoding="utf-8"), encoding="utf-8")
 
@@ -53,3 +72,6 @@ def test_build_uses_latest_scored_print_on_or_before_cutoff(tmp_path: Path) -> N
     assert latest["flags"][0]["as_of"] == "2026-09-30"
     assert "Newer print 9.1 on 2026-10-31 is not scored." in latest["flags"][0]["summary"]
     assert "99.0" not in latest["flags"][0]["summary"]
+    assert latest["since_last_pull"][0].startswith("E-way bills 6.0 -> 7.2")
+    assert "1 more" not in latest["since_last_pull"][1]
+    assert "30 Oct 2026" in latest["since_last_pull"][1]

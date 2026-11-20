@@ -1,0 +1,18 @@
+{
+  "data_pull_as_of": "2026-10-30",
+  "flags": [
+    {"id_prefix": "consumer_sentiment_ics", "name": "Consumer sentiment (ICS)", "latest": -2.5, "z": -1.43, "as_of": "2026-08-31", "monthly_level": "RED", "weekly_level": null},
+    {"id_prefix": "eway_bills", "name": "E-way bills", "latest": 7.2, "z": -1.69, "as_of": "2026-09-30", "monthly_level": "RED", "weekly_level": null},
+    {"id_prefix": "core_cement", "name": "Core cement", "latest": -0.6, "z": -1.3, "as_of": "2026-09-30", "monthly_level": "RED", "weekly_level": null},
+    {"id_prefix": "upi_value", "name": "UPI value", "latest": 18.9, "z": -1.03, "as_of": "2026-08-31", "monthly_level": "RED", "weekly_level": null},
+    {"id_prefix": "oil_consumption", "name": "Oil consumption", "latest": -2.6, "z": -0.91, "as_of": "2026-08-31", "monthly_level": "AMBER", "weekly_level": null},
+    {"id_prefix": "iip_mining", "name": "IIP Mining", "latest": -0.4, "z": -0.78, "as_of": "2026-09-30", "monthly_level": "AMBER", "weekly_level": null},
+    {"id_prefix": "core_steel", "name": "Core steel", "latest": 4.9, "z": -0.79, "as_of": "2026-09-30", "monthly_level": "AMBER", "weekly_level": null},
+    {"id_prefix": "two_wheeler_sales", "name": "Two-wheeler sales", "latest": 13.9, "z": -0.11, "as_of": "2026-08-31", "monthly_level": "AMBER", "weekly_level": null},
+    {"id_prefix": "passenger_car_sales", "name": "Passenger car sales", "latest": -0.7, "z": 0.09, "as_of": "2026-08-31", "monthly_level": "AMBER", "weekly_level": null},
+    {"id_prefix": "non_oil_imports", "name": "Non-oil imports", "latest": 10.9, "z": 0.09, "as_of": "2026-08-31", "monthly_level": "AMBER", "weekly_level": null},
+    {"id_prefix": "gst_collections", "name": "GST collections", "latest": 7.7, "z": -0.03, "as_of": "2026-09-30", "monthly_level": "AMBER", "weekly_level": null},
+    {"id_prefix": "atm_nfs_volume", "name": "ATM (NFS) volume", "latest": 11.1, "z": -1.0, "as_of": "2026-10-04", "monthly_level": null, "weekly_level": "AMBER"},
+    {"id_prefix": "aeps_cash_withdrawals", "name": "AePS cash withdrawals", "latest": 3.6, "z": -0.19, "as_of": "2026-10-04", "monthly_level": null, "weekly_level": "WATCH"}
+  ]
+}
