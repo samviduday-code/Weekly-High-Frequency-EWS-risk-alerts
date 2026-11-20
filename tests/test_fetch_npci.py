@@ -57,7 +57,7 @@ def test_fetch_adds_only_complete_sunday_weeks(tmp_path: Path) -> None:
         check=False,
         capture_output=True,
         text=True,
-        env={"NPCI_DAILY_CSV": str(csv_path), "NPCI_DAILY_URL": ""},
+        env={"NPCI_DAILY_CSV": str(csv_path), "NPCI_DAILY_URL": "", "NPCI_FETCH": "0"},
     )
     assert proc.returncode == 0, proc.stderr + proc.stdout
     updated = json.loads((external / "panel.json").read_text(encoding="utf-8"))

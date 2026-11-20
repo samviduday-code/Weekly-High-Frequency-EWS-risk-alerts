@@ -159,7 +159,12 @@ def same_number(left: object, right: object) -> bool:
     return left == right
 
 
-def movement_lines(previous: dict | None, flags: list[dict], cutoff: date) -> list[str]:
+def movement_lines(
+    previous: dict | None,
+    flags: list[dict],
+    cutoff: date,
+    weekly_rows: list[dict] | None = None,
+) -> list[str]:
     """At most two lines on what changed since the last scored pull."""
     if not previous:
         return ["No earlier pull is stored. This run is the baseline."]
@@ -168,6 +173,37 @@ def movement_lines(previous: dict | None, flags: list[dict], cutoff: date) -> li
         previous_label = date.fromisoformat(str(raw_date)).strftime("%d %b %Y").lstrip("0")
     except ValueError:
         previous_label = str(raw_date)
+    weekly_rows = weekly_rows or []
+    if previous and weekly_rows:
+        previous_weekly = max(
+            (
+                str(flag.get("as_of"))
+                for flag in previous.get("flags", [])
+                if isinstance(flag, dict) and flag.get("weekly_level") and flag.get("as_of")
+            ),
+            default="",
+        )
+        newest = max(str(row["as_of"]) for row in weekly_rows)
+        if previous_weekly and newest > previous_weekly:
+            newest_label = date.fromisoformat(newest).strftime("%d %b %Y").lstrip("0")
+            reds = [
+                row for row in weekly_rows
+                if row["as_of"] == newest and row["level"] == "RED"
+            ]
+            lines = [
+                (
+                    f"Weekly columns now run through {newest_label}. "
+                    f"All {len(weekly_rows)} weekly series were updated from NPCI daily data."
+                )
+            ]
+            if reds:
+                detail = ", ".join(
+                    f"{row['name']} {row['latest']:.1f}% WoW" for row in reds
+                )
+                lines.append(f"RED for the week of {newest_label}: {detail}.")
+            else:
+                lines.append(f"No weekly series is RED for the week of {newest_label}.")
+            return lines
     previous_flags = {
         flag["id_prefix"]: flag
         for flag in previous.get("flags", [])
@@ -246,12 +282,22 @@ def build_vintage(panel: dict, cutoff: date, canvas_url: str | None, previous: d
     flags = []
     monthly_risks: list[float] = []
     weekly_risks: list[float] = []
+    weekly_rows: list[dict] = []
     for series in panel.get("series", []):
         scored = score_series(series, cutoff)
         if scored is None:
             continue
+        level = flag_for_risk(float(scored["risk"]))
         if series.get("cadence") == "weekly":
             weekly_risks.append(float(scored["risk"]))
+            weekly_rows.append(
+                {
+                    "name": series["name"],
+                    "latest": scored["value"],
+                    "as_of": scored["date"],
+                    "level": level,
+                }
+            )
         else:
             monthly_risks.append(float(scored["risk"]))
         flag = build_flag(series, scored)
@@ -285,7 +331,7 @@ def build_vintage(panel: dict, cutoff: date, canvas_url: str | None, previous: d
             "z-score and risk index are calculated from each series' own history."
         ),
         "lending_implications": panel.get("lending_implications") or [],
-        "since_last_pull": movement_lines(previous, flags, cutoff),
+        "since_last_pull": movement_lines(previous, flags, cutoff, weekly_rows),
         "flags": flags,
     }
     if canvas_url:

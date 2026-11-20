@@ -22,6 +22,7 @@ from __future__ import annotations
 import csv
 import json
 import os
+import time
 import urllib.request
 from datetime import date, datetime, timedelta
 from pathlib import Path
@@ -124,6 +125,91 @@ def download(url: str, dest: Path) -> bool:
     return dest.is_file() and dest.stat().st_size > 0
 
 
+NPCI_SERIES = {
+    "atm_nfs_volume": ("nfs", "nfs-daily-statistics", "nfs_volume_mn"),
+    "aeps_cash_withdrawals": ("aeps", "aeps-cash-withdrawal", "aeps_cash_withdrawal_volume_mn"),
+    "fastag_volume": ("netc", "netc-daily-statistics", "netc_volume_mn"),
+    "nach_debit_value": ("nach", "nach-debit-daily-statistics", "nach_debit_value_crores"),
+    "nach_debit_volume": ("nach", "nach-debit-daily-statistics", "nach_debit_volume_mn"),
+    "imps_value": ("imps", "imps-daily-statistics", "imps_value_crores"),
+    "imps_volume": ("imps", "imps-daily-statistics", "imps_volume_mn"),
+    "upi_volume": ("upi", "upi-daily-statistics", "upi_volume_mn"),
+    "upi_value_weekly": ("upi", "upi-daily-statistics", "upi_value_crores"),
+}
+
+
+def npci_get(product: str, tab: str, month: str) -> list[dict]:
+    try:
+        from curl_cffi import requests
+    except ImportError:
+        print("curl_cffi is not installed; skipping the NPCI JSON API")
+        return []
+    url = (
+        "https://www.npci.org.in/api/product-statistic/tab/detail"
+        f"?product_name={product}&tab_name={tab}&excel_type=daily"
+        f"&year=2026&month={month}&page_no=1&page_size=100"
+    )
+    referer = f"https://www.npci.org.in/product/{product}/product-statistics"
+    last_error = "no response"
+    for attempt in range(4):
+        try:
+            response = requests.get(
+                url,
+                impersonate="chrome",
+                timeout=40,
+                headers={"Referer": referer},
+            )
+        except OSError as exc:
+            last_error = str(exc)
+            response = None
+        if response is not None and response.status_code == 200:
+            payload = response.json()
+            rows = (payload.get("data") or {}).get("results") or []
+            return [row for row in rows if str(row.get("npci_day", "")).lower() != "total"]
+        status = response.status_code if response is not None else "error"
+        last_error = f"HTTP {status}"
+        time.sleep(3 * (attempt + 1))
+    print(f"npci {product} {month} failed: {last_error}")
+    return []
+
+
+def load_npci_api() -> tuple[date | None, dict[date, dict[str, float]]]:
+    by_day: dict[date, dict[str, float]] = {}
+    last_day: date | None = None
+    seen: set[tuple[str, str, str]] = set()
+    for _series_id, (product, tab, field) in NPCI_SERIES.items():
+        key = (product, tab, field)
+        if key in seen:
+            continue
+        seen.add(key)
+        for month in ("September", "October", "November"):
+            rows = npci_get(product, tab, month)
+            if rows and field not in rows[0]:
+                print(f"npci {product} {tab} has no {field}; keys={sorted(rows[0])}")
+            for row in rows:
+                if field not in row or not row.get("npci_day"):
+                    continue
+                try:
+                    day = datetime.strptime(str(row["npci_day"]), "%B %d, %Y").date()
+                    value = float(str(row[field]).replace(",", ""))
+                except (TypeError, ValueError):
+                    continue
+                by_day.setdefault(day, {})
+                # field is unique per series; map back below
+                by_day[day][field] = value
+                last_day = day if last_day is None or day > last_day else last_day
+            time.sleep(1.2)
+    mapped: dict[date, dict[str, float]] = {}
+    field_to_series = {field: series_id for series_id, (*_rest, field) in NPCI_SERIES.items()}
+    for day, fields in by_day.items():
+        mapped[day] = {}
+        for field, value in fields.items():
+            series_id = field_to_series.get(field)
+            if series_id:
+                mapped[day][series_id] = value
+    return last_day, mapped
+
+
 def choose_source() -> tuple[Path | None, str]:
     override = os.environ.get("NPCI_DAILY_CSV", "").strip()
     local = Path(override) if override else LOCAL_CSV
@@ -189,14 +275,32 @@ def append_weeks(panel: dict, totals: dict[date, dict[str, float]]) -> int:
 
 
 def main() -> int:
+    by_day: dict[date, dict[str, float]] = {}
+    last_day: date | None = None
+    labels: list[str] = []
+    if os.environ.get("NPCI_FETCH", "1") != "0":
+        api_last, api_days = load_npci_api()
+        if api_last is not None:
+            by_day.update(api_days)
+            last_day = api_last
+            labels.append(f"NPCI JSON through {api_last.isoformat()}")
     path, label = choose_source()
-    if path is None:
+    if path is not None:
+        csv_last, csv_days = load_csv(path)
+        for day, values in csv_days.items():
+            slot = by_day.setdefault(day, {})
+            for series_id, value in values.items():
+                slot.setdefault(series_id, value)
+        if last_day is None or csv_last > last_day:
+            last_day = csv_last
+        labels.append(label)
+    if last_day is None:
         print(
             "NPCI daily file not available. Save a browser download at "
             f"{LOCAL_CSV} and run again. Weekly columns stay as they are."
         )
         return 0
-    last_day, by_day = load_csv(path)
+    label = "; ".join(labels)
     totals = complete_week_totals(by_day, last_day)
     panel = json.loads(PANEL_PATH.read_text(encoding="utf-8"))
     added = append_weeks(panel, totals)

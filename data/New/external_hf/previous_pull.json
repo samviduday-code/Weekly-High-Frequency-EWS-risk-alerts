@@ -83,20 +83,74 @@
       "weekly_level": null
     },
     {
-      "id_prefix": "atm_nfs_volume",
-      "name": "ATM (NFS) volume",
-      "latest": 11.1,
-      "z": -1.05,
-      "as_of": "2026-10-04",
+      "id_prefix": "aeps_cash_withdrawals",
+      "name": "AePS cash withdrawals",
+      "latest": -16.7,
+      "z": 0.57,
+      "as_of": "2026-11-15",
+      "monthly_level": null,
+      "weekly_level": "WATCH"
+    },
+    {
+      "id_prefix": "fastag_volume",
+      "name": "FASTag volume",
+      "latest": 13.1,
+      "z": 0.59,
+      "as_of": "2026-11-15",
+      "monthly_level": null,
+      "weekly_level": "WATCH"
+    },
+    {
+      "id_prefix": "nach_debit_value",
+      "name": "NACH debit value",
+      "latest": -12.5,
+      "z": -0.35,
+      "as_of": "2026-11-15",
+      "monthly_level": null,
+      "weekly_level": "AMBER"
+    },
+    {
+      "id_prefix": "imps_value",
+      "name": "IMPS value",
+      "latest": -30.2,
+      "z": -1.39,
+      "as_of": "2026-11-15",
       "monthly_level": null,
       "weekly_level": "RED"
     },
     {
-      "id_prefix": "aeps_cash_withdrawals",
-      "name": "AePS cash withdrawals",
-      "latest": 3.6,
-      "z": -0.36,
-      "as_of": "2026-10-04",
+      "id_prefix": "upi_volume",
+      "name": "UPI volume",
+      "latest": -11.0,
+      "z": -0.8,
+      "as_of": "2026-11-15",
+      "monthly_level": null,
+      "weekly_level": "AMBER"
+    },
+    {
+      "id_prefix": "upi_value_weekly",
+      "name": "UPI value (weekly)",
+      "latest": -24.5,
+      "z": -1.24,
+      "as_of": "2026-11-15",
+      "monthly_level": null,
+      "weekly_level": "RED"
+    },
+    {
+      "id_prefix": "imps_volume",
+      "name": "IMPS volume",
+      "latest": -21.9,
+      "z": -1.2,
+      "as_of": "2026-11-15",
+      "monthly_level": null,
+      "weekly_level": "RED"
+    },
+    {
+      "id_prefix": "nach_debit_volume",
+      "name": "NACH debit volume",
+      "latest": -28.4,
+      "z": -0.43,
+      "as_of": "2026-11-15",
       "monthly_level": null,
       "weekly_level": "AMBER"
     }
