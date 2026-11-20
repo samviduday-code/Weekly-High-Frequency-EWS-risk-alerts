@@ -6,6 +6,8 @@ Indian HF early-warning (EWS) risk alerts pipeline.
 
 | Location | Purpose |
 | --- | --- |
+| `data/fetch_new_hf_and_sep_actuals.py` | Adds complete NPCI Sunday weeks from a daily CSV |
+| `data/New/external_hf/npci_daily.csv` | Optional browser download of the NPCI daily file. Used when it is newer than the public copy |
 | `data/build_ews_vintages.py` | Rebuilds `latest.json` on each weekly run |
 | `data/New/external_hf/panel.json` | Series the builder reads. Add a new observation to update the next run |
 | `data/New/external_hf/latest.json` | Vintage written by the builder |
