@@ -1,4 +1,4 @@
-"""Persist last Slack post metadata for duplicate detection."""
+"""Persist last emailed digest metadata for duplicate detection."""
 
 from __future__ import annotations
 
@@ -23,14 +23,14 @@ def save_last_post(
     *,
     week_iso: str,
     digest_hash: str,
-    channel_id: str,
+    recipient: str,
 ) -> None:
     path = repeat_guard_path()
     path.parent.mkdir(parents=True, exist_ok=True)
     payload = {
         "week_iso": week_iso,
         "digest_hash": digest_hash,
-        "channel_id": channel_id,
+        "recipient": recipient,
         "posted_at": datetime.now(timezone.utc).isoformat(),
     }
     path.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")

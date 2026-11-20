@@ -6,26 +6,41 @@ Indian HF early-warning (EWS) risk alerts pipeline.
 
 | Location | Purpose |
 | --- | --- |
-| `INDEX_DATA_DIR` (default: `.data/index-data`) | Clone of `samviduday-code/index-data` with fetch/build scripts |
-| `New/external_hf/latest.json` | Built EWS vintages consumed by the digest |
-| `.ews/slack_last_post.json` | Repeat guard (not committed) |
+| `data/fetch_new_hf_and_sep_actuals.py` | Adds complete NPCI Sunday weeks from a daily CSV |
+| `data/New/external_hf/npci_daily.csv` | Optional browser download of the NPCI daily file. Used when it is newer than the public copy |
+| `data/build_ews_vintages.py` | Rebuilds `latest.json` on each weekly run |
+| `data/New/external_hf/panel.json` | Series the builder reads. Add a new observation to update the next run |
+| `data/New/external_hf/latest.json` | Vintage written by the builder |
+| `data/New/external_hf/latest.example.json` | Shape to copy. The weekly command does not read it. |
+| `.ews/email_last_post.json` | Repeat guard (not committed) |
 
-Bootstrap index-data:
+Add this week's vintage on GitHub:
+
+1. Open the repo, then **Add file → Create new file**.
+2. Name the file `data/New/external_hf/latest.json` (type the slashes; GitHub creates the folders).
+3. Paste the JSON. Start from `latest.example.json`. Set `monthly_as_of` to the real monthly date (`YYYY-MM-DD`, within 75 days). Each flag that should be emailed needs `"priority": "High_Priority"` and a `monthly_level` or `weekly_level` such as `"P1"`. `summary` is the line in the email. `id_prefix` is the indicator name.
+4. Commit the file to `main`.
+
+From a clone:
 
 ```bash
-bash scripts/bootstrap_index_data.sh
+mkdir -p data/New/external_hf
+# save the vintage as data/New/external_hf/latest.json
+git add data/New/external_hf/latest.json
+git commit -m "Add this week's EWS vintage"
+git push
 ```
 
 ## Weekly Monday digest
 
 ```bash
 .venv/bin/python -m ews weekly              # stdout only
-.venv/bin/python -m ews weekly --post-slack  # requires SLACK_BOT_TOKEN
+.venv/bin/python -m ews weekly --post-email  # requires SMTP_HOST, SMTP_USERNAME, SMTP_PASSWORD
 ```
 
 Gates: refuse when monthly data is older than 75 days; skip duplicate digests in the same ISO week; High_Priority flags only.
 
-Delivery channel: `#weekly-high-frequency-ews` (`C0CH2MP70RF`).
+Delivery: email to `samvid.uday@navi.com` (`EWS_EMAIL_TO` overrides the recipient). `SMTP_PORT` defaults to 587 with STARTTLS. Set `EWS_EMAIL_FROM` when the From address differs from `SMTP_USERNAME`.
 
 ## Development (Cloud Agent)
 

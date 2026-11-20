@@ -1,4 +1,5 @@
 .data/
+data/New/external_hf/.npci_daily_download.csv
 .ews/
 .venv/
 __pycache__/

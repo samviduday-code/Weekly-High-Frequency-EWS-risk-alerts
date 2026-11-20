@@ -1,0 +1,140 @@
+{
+  "data_pull_as_of": "2026-11-20",
+  "flags": [
+    {
+      "id_prefix": "consumer_sentiment_ics",
+      "name": "Consumer sentiment (ICS)",
+      "latest": -2.5,
+      "z": -1.46,
+      "as_of": "2026-08-31",
+      "monthly_level": "RED",
+      "weekly_level": null
+    },
+    {
+      "id_prefix": "eway_bills",
+      "name": "E-way bills",
+      "latest": 7.2,
+      "z": -0.89,
+      "as_of": "2026-09-30",
+      "monthly_level": "AMBER",
+      "weekly_level": null
+    },
+    {
+      "id_prefix": "upi_value",
+      "name": "UPI value",
+      "latest": 15.6,
+      "z": -0.83,
+      "as_of": "2026-10-31",
+      "monthly_level": "AMBER",
+      "weekly_level": null
+    },
+    {
+      "id_prefix": "core_steel",
+      "name": "Core steel",
+      "latest": 4.9,
+      "z": -0.04,
+      "as_of": "2026-09-30",
+      "monthly_level": "AMBER",
+      "weekly_level": null
+    },
+    {
+      "id_prefix": "two_wheeler_sales",
+      "name": "Two-wheeler sales",
+      "latest": 16.1,
+      "z": -0.62,
+      "as_of": "2026-10-31",
+      "monthly_level": "AMBER",
+      "weekly_level": null
+    },
+    {
+      "id_prefix": "passenger_car_sales",
+      "name": "Passenger car sales",
+      "latest": 12.4,
+      "z": -0.21,
+      "as_of": "2026-10-31",
+      "monthly_level": "AMBER",
+      "weekly_level": null
+    },
+    {
+      "id_prefix": "non_oil_imports",
+      "name": "Non-oil imports",
+      "latest": 7.5,
+      "z": -0.63,
+      "as_of": "2026-10-31",
+      "monthly_level": "AMBER",
+      "weekly_level": null
+    },
+    {
+      "id_prefix": "aeps_cash_withdrawals",
+      "name": "AePS cash withdrawals",
+      "latest": -16.7,
+      "z": 0.57,
+      "as_of": "2026-11-15",
+      "monthly_level": null,
+      "weekly_level": "WATCH"
+    },
+    {
+      "id_prefix": "fastag_volume",
+      "name": "FASTag volume",
+      "latest": 13.1,
+      "z": 0.59,
+      "as_of": "2026-11-15",
+      "monthly_level": null,
+      "weekly_level": "WATCH"
+    },
+    {
+      "id_prefix": "nach_debit_value",
+      "name": "NACH debit value",
+      "latest": -12.5,
+      "z": -0.35,
+      "as_of": "2026-11-15",
+      "monthly_level": null,
+      "weekly_level": "AMBER"
+    },
+    {
+      "id_prefix": "imps_value",
+      "name": "IMPS value",
+      "latest": -30.2,
+      "z": -1.39,
+      "as_of": "2026-11-15",
+      "monthly_level": null,
+      "weekly_level": "RED"
+    },
+    {
+      "id_prefix": "upi_volume",
+      "name": "UPI volume",
+      "latest": -11.0,
+      "z": -0.8,
+      "as_of": "2026-11-15",
+      "monthly_level": null,
+      "weekly_level": "AMBER"
+    },
+    {
+      "id_prefix": "upi_value_weekly",
+      "name": "UPI value (weekly)",
+      "latest": -24.5,
+      "z": -1.24,
+      "as_of": "2026-11-15",
+      "monthly_level": null,
+      "weekly_level": "RED"
+    },
+    {
+      "id_prefix": "imps_volume",
+      "name": "IMPS volume",
+      "latest": -21.9,
+      "z": -1.2,
+      "as_of": "2026-11-15",
+      "monthly_level": null,
+      "weekly_level": "RED"
+    },
+    {
+      "id_prefix": "nach_debit_volume",
+      "name": "NACH debit volume",
+      "latest": -28.4,
+      "z": -0.43,
+      "as_of": "2026-11-15",
+      "monthly_level": null,
+      "weekly_level": "AMBER"
+    }
+  ]
+}
