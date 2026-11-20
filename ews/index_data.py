@@ -83,10 +83,15 @@ def run_fetch_and_build(*, skip_fetch: bool = False) -> BuildOutcome:
             return BuildOutcome(True, "using committed latest.json", index_data_dir)
         return BuildOutcome(False, _missing_latest_message(index_data_dir), index_data_dir)
 
-    if not skip_fetch:
+    if not skip_fetch and fetch_script is not None:
         code, msg = _run_script(index_data_dir, FETCH_SCRIPT)
         if code != 0:
             return BuildOutcome(False, f"{FETCH_SCRIPT} failed: {msg}", index_data_dir)
+
+    if build_script is None:
+        if latest_json_path(index_data_dir).is_file():
+            return BuildOutcome(True, "using committed latest.json", index_data_dir)
+        return BuildOutcome(False, _missing_latest_message(index_data_dir), index_data_dir)
 
     code, msg = _run_script(index_data_dir, BUILD_SCRIPT)
     if code != 0:

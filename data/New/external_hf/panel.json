@@ -1,0 +1,171 @@
+{
+  "monthly_risk_index": 47.4,
+  "weekly_risk_index": 32.1,
+  "canvas_url": "https://cursor.com/canvas/store-5efb6e68-b033-4351-a5f5-0e9f2c7d5acc/4f71579d-73fc-4cc2-a806-c4c9aa36a5ff",
+  "lending_implications": [
+    "Household demand / confidence soft. Sentiment is below its own history, which pressures discretionary personal loans and BNPL. Keep salary verification strict. Vars: Consumer sentiment (ICS).",
+    "Activity mix uneven. Goods-movement and construction-adjacent series are soft. Prefer salaried and GST-registered self-employed borrowers. Vars: Core cement, E-way bills, IIP Mining, Core steel.",
+    "Digital payments are decelerating versus their own trend. UPI is still up year on year but below trend. Pause aggressive limit increases for thin-file digital-only customers. Vars: UPI value.",
+    "Cash-stress proxies. Rising ATM and AePS use is inverted, so an increase marks rural and semi-urban liquidity stress. Vars: ATM (NFS) volume, AePS cash withdrawals.",
+    "System credit backdrop. Bank credit is still firm versus history. Defend cutoffs against adverse selection if competitors ease. Vars: Bank credit, Non-food bank credit."
+  ],
+  "series": [
+    {
+      "id_prefix": "consumer_sentiment_ics",
+      "name": "Consumer sentiment (ICS)",
+      "cadence": "monthly",
+      "metric": "YoY %",
+      "watchlist_priority": "P1",
+      "lending_link": "Willingness to borrow",
+      "source": "RBI / DBIE consumer confidence (ICS)",
+      "observations": [
+        {"date": "2026-08-31", "value": -2.5, "z": -1.43, "risk": 71.1}
+      ]
+    },
+    {
+      "id_prefix": "eway_bills",
+      "name": "E-way bills",
+      "cadence": "monthly",
+      "metric": "YoY %",
+      "watchlist_priority": "P2",
+      "lending_link": "Trade throughput",
+      "source": "GSTN / assembled HF",
+      "observations": [
+        {"date": "2026-09-30", "value": 7.2, "z": -1.69, "risk": 73.7}
+      ]
+    },
+    {
+      "id_prefix": "core_cement",
+      "name": "Core cement",
+      "cadence": "monthly",
+      "metric": "YoY %",
+      "watchlist_priority": "P2",
+      "lending_link": "Housing and infra",
+      "source": "OEA ICI / DBIE",
+      "observations": [
+        {"date": "2026-09-30", "value": -0.6, "z": -1.3, "risk": 69.3}
+      ]
+    },
+    {
+      "id_prefix": "upi_value",
+      "name": "UPI value",
+      "cadence": "monthly",
+      "metric": "YoY %",
+      "watchlist_priority": "P2",
+      "lending_link": "Digital spend velocity",
+      "source": "NPCI monthly (panel)",
+      "observations": [
+        {"date": "2026-08-31", "value": 18.9, "z": -1.03, "risk": 65.8}
+      ]
+    },
+    {
+      "id_prefix": "oil_consumption",
+      "name": "Oil consumption",
+      "cadence": "monthly",
+      "metric": "YoY %",
+      "lending_link": "Transport spend",
+      "source": "PPAC / DBIE",
+      "observations": [
+        {"date": "2026-08-31", "value": -2.6, "z": -0.91, "risk": 64.0}
+      ]
+    },
+    {
+      "id_prefix": "iip_mining",
+      "name": "IIP Mining",
+      "cadence": "monthly",
+      "metric": "YoY %",
+      "watchlist_priority": "P2",
+      "lending_link": "Rural and industrial incomes",
+      "source": "MoSPI IIP",
+      "observations": [
+        {"date": "2026-09-30", "value": -0.4, "z": -0.78, "risk": 60.8}
+      ]
+    },
+    {
+      "id_prefix": "core_steel",
+      "name": "Core steel",
+      "cadence": "monthly",
+      "metric": "YoY %",
+      "watchlist_priority": "P2",
+      "lending_link": "Construction jobs",
+      "source": "OEA ICI / DBIE",
+      "observations": [
+        {"date": "2026-09-30", "value": 4.9, "z": -0.79, "risk": 60.6}
+      ]
+    },
+    {
+      "id_prefix": "two_wheeler_sales",
+      "name": "Two-wheeler sales",
+      "cadence": "monthly",
+      "metric": "YoY %",
+      "watchlist_priority": "P2",
+      "lending_link": "Mass-market and rural",
+      "source": "SIAM / DBIE autos",
+      "summary_note": "Scored through Aug because SIAM Sep is not like-for-like with DBIE history.",
+      "observations": [
+        {"date": "2026-08-31", "value": 13.9, "z": -0.11, "risk": 54.0}
+      ]
+    },
+    {
+      "id_prefix": "passenger_car_sales",
+      "name": "Passenger car sales",
+      "cadence": "monthly",
+      "metric": "YoY %",
+      "watchlist_priority": "P2",
+      "lending_link": "Big-ticket affordability",
+      "source": "SIAM / DBIE autos",
+      "summary_note": "Scored through Aug because SIAM Sep is not like-for-like with DBIE history.",
+      "observations": [
+        {"date": "2026-08-31", "value": -0.7, "z": 0.09, "risk": 53.7}
+      ]
+    },
+    {
+      "id_prefix": "non_oil_imports",
+      "name": "Non-oil imports",
+      "cadence": "monthly",
+      "metric": "YoY %",
+      "lending_link": "Import-led consumption",
+      "source": "DGCI&S / DBIE",
+      "observations": [
+        {"date": "2026-08-31", "value": 10.9, "z": 0.09, "risk": 50.4}
+      ]
+    },
+    {
+      "id_prefix": "gst_collections",
+      "name": "GST collections",
+      "cadence": "monthly",
+      "metric": "YoY %",
+      "lending_link": "Taxable activity",
+      "source": "GST / MoF releases",
+      "observations": [
+        {"date": "2026-09-30", "value": 7.7, "z": -0.03, "risk": 50.3}
+      ]
+    },
+    {
+      "id_prefix": "atm_nfs_volume",
+      "name": "ATM (NFS) volume",
+      "cadence": "weekly",
+      "metric": "WoW %",
+      "watchlist_priority": "P1",
+      "inverted": true,
+      "lending_link": "Cash preference (a rise means stress)",
+      "source": "NPCI daily — ATM network (NFS) txn count",
+      "observations": [
+        {"date": "2026-10-04", "value": 11.1, "z": -1.0, "risk": 61.6}
+      ]
+    },
+    {
+      "id_prefix": "aeps_cash_withdrawals",
+      "name": "AePS cash withdrawals",
+      "cadence": "weekly",
+      "metric": "WoW %",
+      "watchlist_priority": "P1",
+      "inverted": true,
+      "lending_link": "Rural cash stress if rising",
+      "source": "NPCI daily — AePS cash withdrawal count",
+      "observations": [
+        {"date": "2026-10-04", "value": 3.6, "z": -0.19, "risk": 48.6}
+      ]
+    }
+  ]
+}

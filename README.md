@@ -6,7 +6,9 @@ Indian HF early-warning (EWS) risk alerts pipeline.
 
 | Location | Purpose |
 | --- | --- |
-| `data/New/external_hf/latest.json` | This week's vintage. Commit this file in the repo. |
+| `data/build_ews_vintages.py` | Rebuilds `latest.json` on each weekly run |
+| `data/New/external_hf/panel.json` | Series the builder reads. Add a new observation to update the next run |
+| `data/New/external_hf/latest.json` | Vintage written by the builder |
 | `data/New/external_hf/latest.example.json` | Shape to copy. The weekly command does not read it. |
 | `.ews/email_last_post.json` | Repeat guard (not committed) |
 
