@@ -9,10 +9,8 @@ ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "data" / "build_ews_vintages.py"
 
 
-def test_build_uses_latest_scored_print_on_or_before_cutoff(tmp_path: Path) -> None:
+def test_build_scores_the_latest_print_on_or_before_cutoff(tmp_path: Path) -> None:
     panel = {
-        "monthly_risk_index": 47.4,
-        "weekly_risk_index": 32.1,
         "lending_implications": ["Keep the cutoff rule."],
         "series": [
             {
@@ -23,9 +21,10 @@ def test_build_uses_latest_scored_print_on_or_before_cutoff(tmp_path: Path) -> N
                 "lending_link": "Trade throughput",
                 "source": "GSTN",
                 "observations": [
-                    {"date": "2026-09-30", "value": 7.2, "z": -1.69, "risk": 73.7},
-                    {"date": "2026-10-31", "value": 9.1},
-                    {"date": "2026-11-30", "value": 99.0, "z": -2.0, "risk": 80.0},
+                    {"date": "2026-08-31", "value": 10},
+                    {"date": "2026-09-30", "value": 8},
+                    {"date": "2026-10-31", "value": 4},
+                    {"date": "2026-11-30", "value": 99},
                 ],
             }
         ],
@@ -68,10 +67,11 @@ def test_build_uses_latest_scored_print_on_or_before_cutoff(tmp_path: Path) -> N
     assert latest["monthly_as_of"] == "2026-11-20"
     assert latest["generated_at"] == "2026-11-20"
     assert latest["red_flags"] == 1
-    assert latest["flags"][0]["latest"] == 7.2
-    assert latest["flags"][0]["as_of"] == "2026-09-30"
-    assert "Newer print 9.1 on 2026-10-31 is not scored." in latest["flags"][0]["summary"]
-    assert "99.0" not in latest["flags"][0]["summary"]
-    assert latest["since_last_pull"][0].startswith("E-way bills 6.0 -> 7.2")
+    assert latest["flags"][0]["latest"] == 4
+    assert latest["flags"][0]["as_of"] == "2026-10-31"
+    assert latest["flags"][0]["z"] < 0
+    assert latest["flags"][0]["monthly_level"] == "RED"
+    assert "99" not in latest["flags"][0]["summary"]
+    assert latest["since_last_pull"][0].startswith("E-way bills 6.0 -> 4")
     assert "1 more" not in latest["since_last_pull"][1]
     assert "30 Oct 2026" in latest["since_last_pull"][1]
