@@ -20,29 +20,11 @@
       "weekly_level": null
     },
     {
-      "id_prefix": "core_cement",
-      "name": "Core cement",
-      "latest": -0.6,
-      "z": -0.71,
-      "as_of": "2026-09-30",
-      "monthly_level": "AMBER",
-      "weekly_level": null
-    },
-    {
       "id_prefix": "upi_value",
       "name": "UPI value",
-      "latest": 18.9,
-      "z": -0.5,
-      "as_of": "2026-08-31",
-      "monthly_level": "AMBER",
-      "weekly_level": null
-    },
-    {
-      "id_prefix": "oil_consumption",
-      "name": "Oil consumption",
-      "latest": -2.6,
-      "z": -0.02,
-      "as_of": "2026-08-31",
+      "latest": 15.6,
+      "z": -0.83,
+      "as_of": "2026-10-31",
       "monthly_level": "AMBER",
       "weekly_level": null
     },
@@ -58,27 +40,27 @@
     {
       "id_prefix": "two_wheeler_sales",
       "name": "Two-wheeler sales",
-      "latest": 13.9,
-      "z": -1.29,
-      "as_of": "2026-08-31",
-      "monthly_level": "RED",
+      "latest": 16.1,
+      "z": -0.62,
+      "as_of": "2026-10-31",
+      "monthly_level": "AMBER",
       "weekly_level": null
     },
     {
       "id_prefix": "passenger_car_sales",
       "name": "Passenger car sales",
-      "latest": -0.7,
-      "z": -1.16,
-      "as_of": "2026-08-31",
-      "monthly_level": "RED",
+      "latest": 12.4,
+      "z": -0.21,
+      "as_of": "2026-10-31",
+      "monthly_level": "AMBER",
       "weekly_level": null
     },
     {
       "id_prefix": "non_oil_imports",
       "name": "Non-oil imports",
-      "latest": 10.9,
-      "z": -0.57,
-      "as_of": "2026-08-31",
+      "latest": 7.5,
+      "z": -0.63,
+      "as_of": "2026-10-31",
       "monthly_level": "AMBER",
       "weekly_level": null
     },
